@@ -38,6 +38,7 @@ the web application.
 Run the python script:
 
 ```
+cd setup
 python3 produce_example_graph_file.py
 ```
 
@@ -102,7 +103,7 @@ Reading file: AFA.freqs.gz
 Change to `app` directory and start the web app.
 
 ```
-cd app
+cd ../app
 python3 app.py
 ```
 
