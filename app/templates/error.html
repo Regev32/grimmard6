@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/results.css">
+<link rel="stylesheet" href="/static/index.css">
+<style>
+    .middle {
+        width: 60%;
+        margin: auto;
+        text-align: center;
+        font-family: arial;
+    }
+
+    .error {
+        font-size: 1vw;
+        color: red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-top">
+    <h1>The following error has occurred</h1>
+</div>
+
+<div class="middle-div">
+    <br>
+    <br>
+    <br>
+    <br>
+    <div class="middle">
+        <!-- <h2>Don't worry. We can fix it together :)</h2> -->
+        <p class="error">
+            {{ error }}
+        </p>
+    </div>
+</div>
+
+{% endblock %}

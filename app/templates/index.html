@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/index.css">
+<script>
+    function submitForm() {
+        document.getElementById("file-form").submit()
+        document.getElementById("geno-file").value = '';
+    }
+
+    // This is for the multiple choise of races
+    $('select').selectpicker();
+
+    function changeSelect(elemId, strId) {
+        const select = document.getElementById(elemId);
+        const selected = [...select.options]
+                        .filter(option => option.selected)
+                        .map(option => option.value);
+        let outputStr = ""
+        selected.forEach(race => {
+            outputStr += race + ";"
+        })
+
+        document.getElementById(strId).value = outputStr;
+    }
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+<style>
+
+</style>
+
+<br>
+<br>
+<div class="page-top">
+    <h1>Genotypes Imputation</h1>
+</div>
+<div class="form">
+    <div class="form-div">
+        <form action="/impute-file" method="post" enctype="multipart/form-data" id="file-form">
+        <div class="load-file-div">
+            <!-- <div class="form-group file-area">
+                <label for="images">Images <span>Your images should be at least 400x300 wide</span></label>
+                <input type="file" name="genofile" id="images" required="required"/>
+            <div class="file-dummy">
+                <div class="success">Great, your files are selected. Keep on.</div>
+                <div class="default">Please select some files</div>
+            </div>
+          </div> -->
+            <input type="file" name="genofile" id="geno-file" class="load-file" onchange="submitForm();">
+        </div>
+        </form>
+        <form action="/impute-form" method="post" enctype="multipart/form-data">
+            <input type="text" name="luci" id="luciStr" hidden>
+            <input type="text" name="race" id="raceStr" hidden>
+        <div class="insert-no-file">
+
+            <div class="left-half race-table">
+                <label for="output-luci">output loci: </label>
+                <select id="output-luci" multiple class="selectpicker" onchange="changeSelect('output-luci', 'luciStr');">
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="DRB1">DRB1</option>
+                    <option value="DQA1">DQA1</option>
+                    <option value="DQB1">DQB1</option>
+                    <option value="DRB3/4/5">DRB3/4/5</option>
+                    <option value="DPA1">DPA1</option>
+                    <option value="DPB1">DPB1</option>
+                </select>
+            </div>
+
+            <div class="left-half race-table">
+                <label for="races">races: </label>
+                <select id="races" multiple class="selectpicker" data-live-search="true" onchange="changeSelect('races', 'raceStr');">
+                    <optgroup label="AFA - African American">
+                        <option value="AFA">AFA</option>
+                        <option value="AAFA">AAFA</option>
+                        <option value="AFB">AFB</option>
+                        <option value="CARB">CARB</option>
+                        <option value="SCAMB">SCAMB</option>
+                    </optgroup>
+                    <optgroup label="API - Asian or Pacific Islander">
+                        <option value="API">API</option>
+                        <option value="AINDI">AINDI</option>
+                        <option value="FILI">FILI</option>
+                        <option value="HAWI">HAWI</option>
+                        <option value="JAPI">JAPI</option>
+                        <option value="KORI">KORI</option>
+                        <option value="NCHI">NCHI</option>
+                        <option value="SCSEAI">SCSEAI</option>
+                        <option value="VIET">VIET</option>
+                    </optgroup>
+                    <optgroup label="CAU - Caucasian">
+                        <option value="CAU">CAU</option>
+                        <option value="NAMER">NAMER</option>
+                        <option value="MENAFC">MENAFC</option>
+                    </optgroup>
+                    <optgroup label="HIS - Hispanic">
+                        <option value="HIS">HIS</option>
+                        <option value="CARHIS">CARHIS</option>
+                        <option value="MSWHIS">MSWHIS</option>
+                        <option value="SCAHIS">SCAHIS</option>
+                    </optgroup>
+                    <optgroup label="NAM - Native AMerican">
+                        <option value="CARIBI">CARIBI</option>
+                        <option value="AMIND">AMIND</option>
+                        <option value="AISC">AISC</option>
+                        <option value="ALANAM">ALANAM</option>
+                    </optgroup>
+                </select>
+            </div>
+            <br>
+            <br>
+            <div class="glstring">
+                <!-- Gl-string:  <br> -->
+                <input type="text" class="gl-string" name="glstring" placeholder="Gl-string">
+            </div>
+            <br>
+            <!-- Alleles seperatly: -->
+            <br>   
+            <table class="alleles-table">
+                <tr>
+                    <td>A1</td>
+                    <td><input type="text" id="A1" name="A1" tabindex="1" class="hla-input"></td>
+                    <td>B1</td>
+                    <td><input type="text" id="B1" name="B1" tabindex="3" class="hla-input"></td>
+                    <td>C1</td>
+                    <td><input type="text" id="C1" name="C1" tabindex="5" class="hla-input"></td>
+                    <td>DRB1</td>
+                    <td><input type="text" id="DRB1" name="DRB1_1" tabindex="7" class="hla-input"></td>
+                </tr>
+                <tr>
+                    <td>A2</td>
+                    <td><input type="text" id="A2" name="A2" tabindex="2" class="hla-input"></td>
+                    <td>B2</td>
+                    <td><input type="text" id="B2" name="B2" tabindex="4"class="hla-input"></td>
+                    <td>C2</td>
+                    <td><input type="text" id="C2" name="C2" tabindex="6" class="hla-input"></td>
+                    <td>DRB1</td>
+                    <td><input type="text" id="DRB2" name="DRB1_2" tabindex="8" class="hla-input"></td>
+                </tr>
+                <tr>
+                    <td>DQB1</td>
+                    <td><input type="text"  name="DQB1_1" tabindex="9" class="hla-input"></td>
+                    <td>DRB3</td>
+                    <td><input type="text"  name="DRB3_1" tabindex="11" class="hla-input"></td>
+                    <td>DRB4</td>
+                    <td><input type="text" name="DRB4_1" tabindex="13" class="hla-input"></td>
+                    <td>DRB5</td>
+                    <td><input type="text" name="DRB5_1" tabindex="15" class="hla-input"></td>
+                </tr>
+                <tr>
+                    <td>DQB1</td>
+                    <td><input type="text" id="DQB2" name="DQB1_2" tabindex="10" class="hla-input"></td>
+                    <td>DRB3</td>
+                    <td><input type="text" name="DRB3_2" tabindex="12" class="hla-input"></td>
+                    <td>DRB4</td>
+                    <td><input type="text" name="DRB4_2" tabindex="14" class="hla-input"></td>
+                    <td>DRB5</td>
+                    <td><input type="text" name="DRB5_2" tabindex="16" class="hla-input"></td>
+                </tr>
+            </table>
+            <br>
+            <button class="btn btn-primary" type="submit" tabindex="17" class="bottom-submit">Submit form</button>
+            <br>
+        </div>
+        <br>
+        <div class="form-bottom-div">
+            <!-- <label for="gentic_or_serology">Input format</label>
+            <select id="gentic_or_serology" name="gentic_or_serology" class="bottom-submit">
+                <option value="genetic" selected="selected">Genetic (default)</option>
+                <option value="Serology">Serology</option>
+            </select> -->
+            <br>
+
+            <!-- <button class="btn btn-primary" type="button" class="bottom-submit" onclick="printRaces()">Submit form</button> -->
+        </div>
+    </form>
+</div>
+{% endblock %}
+</div>
