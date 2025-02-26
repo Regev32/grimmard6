@@ -203,5 +203,5 @@
   "imputation_out_problem_filename": "don.problem",
   "max_haplotypes_number_in_phase": 100,
   "imputation_out_path": "output_new",
-  "pops_count_file": "./conf/pop_counts_file.txt"
+  "pops_count_file": "output_new/pop_counts_file.txt"
 }
