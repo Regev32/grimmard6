@@ -74,6 +74,7 @@ def run_impute(conf_file, graph, input_path, output_haplotype_path, output_genot
     config["full_loci"] = ''.join(sorted(all_loci_set))
     
     # Perform imputation
+    config["pops_count_file"] = "../setup/" + config["pops_count_file"]
     imputation = grim.impute_instance(config, graph)
 
     # Create output directory if it doesn't exist

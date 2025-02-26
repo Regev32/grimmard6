@@ -215,3 +215,30 @@ Change `GRIM_GRAPH` to the path of the frequency graph you created and saved e.g
 export GRIM_GRAPH=my-graph.pickle
 ```
 
+Here’s the text you can add to your **README** file:
+
+---
+
+### **Note: Using an Existing Graph**
+If you **already have a graph**, you only need to run the Python script **`produce_example_graph_file.py`** starting from **Step 3** (**skip Step 1 and Step 2**).
+
+#### **Required File Locations**
+Make sure to place the necessary files in the correct directories:
+- **Graph-related files** should be inside the **`csv`** directory.
+- The **path for `csv`** should be:
+  ```
+  setup/output_new/csv
+  ```
+- The **population counts file (`pop_counts_file.txt`)** should be located at:
+  ```
+  setup/output_new/pop_counts_file.txt
+  ```
+- The **configuration file (`conf.json`)** should be placed at:
+  ```
+  app/conf/conf.json
+  ```
+
+Ensure that all required files are correctly placed before running the script.
+
+---
+
