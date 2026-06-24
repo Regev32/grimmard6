@@ -1,25 +1,186 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet" href="/static/index.css">
 <style>
-    .main-div {
-        margin: auto;
-        width: 80%;
-    }
+.grimmard-example { line-height: 1.6; color: #1f2733; padding: 0 32px; box-sizing: border-box; }
+.grimmard-example a { color: #66b3ff; font-weight: 600; }
+.grimmard-example a:hover { color: #93caff; }
+.grimmard-example h1 { color: #16314f; border-bottom: 2px solid #2f6db5; padding-bottom: 6px; }
+.grimmard-example h2 { color: #16314f; margin-top: 1.8em; border-bottom: 2px solid #2f6db5; padding-bottom: 4px; }
+.grimmard-example h3 { color: #2f6db5; margin-top: 1.2em; }
+.grimmard-example code {
+  font-family: Consolas, "Courier New", monospace;
+  background: transparent; border: none; padding: 0;
+  font-size: 0.92em; color: #16314f; word-break: break-word;
+}
+.grimmard-example td code, .grimmard-example th code {
+  background: #f1f5fa; border: 1px solid #d6e0ec; border-radius: 3px; padding: 1px 5px;
+}
+.grimmard-example pre {
+  background: #f1f5fa; border: 1px solid #d6e0ec; border-left: 4px solid #2f6db5;
+  border-radius: 4px; padding: 12px 14px; overflow-x: auto; font-size: 0.92em;
+  white-space: pre-wrap; word-break: break-word;
+}
+.grimmard-example table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.94em; }
+.grimmard-example th, .grimmard-example td { border: 1px solid #d6e0ec; padding: 7px 10px; text-align: left; vertical-align: top; }
+.grimmard-example th { background: #eaf1f9; color: #16314f; }
+.grimmard-example tbody tr { background: #ffffff; }
+.grimmard-example tbody tr:nth-child(even) { background: #eef3f9; }
+.grimmard-example .case {
+  border: 1px solid #d6e0ec; border-radius: 6px; padding: 4px 18px 14px; margin: 1.2em 0;
+  background: #fcfdff;
+}
+.grimmard-example .label { color: #2f6db5; font-weight: bold; }
+.grimmard-example .tip {
+  background: #ecf7ef; border: 1px solid #b9e0c4; border-left: 4px solid #41a05f;
+  border-radius: 4px; padding: 10px 14px; margin: 1em 0;
+}
+.grimmard-example ul, .grimmard-example ol { padding-left: 1.4em; }
+.grimmard-example li { margin: 0.3em 0; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-top">
-    <h1>Example</h1>
+<div class="grimmard-example">
+
+<h1>Example</h1>
+
+<p>
+This page walks through several worked inputs, from a simple three-locus typing up to a full nine-locus,
+mixed-resolution case. Each example lists the <strong>output loci</strong> to tick, the
+<strong>population</strong> to select, and a GL&#8209;string you can copy directly into the typing box on the
+<a href="/Home">Home</a> page. Need a refresher on the format or the
+population codes first? See the <a href="/Help">Help</a> page.
+</p>
+
+<div class="tip">
+<strong>The quick one:</strong> if you just want to see the tool run, select <strong>output loci</strong>
+A, B, DRB1, pick population <strong>CAU</strong>, and paste:
+<pre>A*02:01+A*02:01^B*40:01+B*57:01^DRB1*04:01+DRB1*07:01</pre>
+Then press <strong>Submit form</strong>.
 </div>
-<div class="main-div">
-    You may use this glstring for example:
-    <br>
-    A*02:01+A*02:01^B*40:01+B*57:01^DRB1*04:01+DRB1*07:01
+
+<h2>Example 1 &mdash; A simple three-locus typing</h2>
+<div class="case">
+<p><span class="label">Goal:</span> impute a full genotype from just HLA-A, HLA-B and HLA-DRB1.</p>
+<p><span class="label">Output loci:</span> A, B, DRB1 (or tick more to have them imputed)</p>
+<p><span class="label">Population:</span> CAU</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*02:01+A*02:01^B*40:01+B*57:01^DRB1*04:01+DRB1*07:01</pre>
+<p>
+Here <code>'+'</code> joins the two alleles at each locus and <code>'^'</code> separates the loci. The person is
+homozygous at HLA-A (<code>A*02:01</code> on both chromosomes) and heterozygous at HLA-B and HLA-DRB1.
+</p>
+<p><span class="label">What you get back:</span> ranked complete genotypes (Genotypes tab), the haplotype
+pairs that compose them (Haplotype couples tab), and per-population haplotype probabilities
+(Haplotype separate tab). Because only three loci were typed, the remaining loci are inferred from
+Caucasian haplotype frequencies, so probability is spread across several plausible genotypes.</p>
+</div>
+
+<h2>Example 2 &mdash; A full five-locus high-resolution typing</h2>
+<div class="case">
+<p><span class="label">Goal:</span> phase a classical 10/10 (five-locus) typing and obtain haplotype
+probabilities.</p>
+<p><span class="label">Output loci:</span> A, B, C, DRB1, DQB1</p>
+<p><span class="label">Population:</span> CAU (or a detailed code such as NAMER)</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*01:01+A*03:01^C*07:01+C*07:02^B*08:01+B*07:02^DRB1*03:01+DRB1*15:01^DQB1*02:01+DQB1*06:02</pre>
+<p>
+All five classical loci are typed at high resolution. With this much information the imputation is sharply
+constrained: a small number of haplotype pairs dominate, and the top genotype usually carries most of the
+probability. This case includes two well-known European haplotypes, so the phasing is strongly supported.
+</p>
+</div>
+
+<h2>Example 3 &mdash; Full nine-locus typing</h2>
+<div class="case">
+<p><span class="label">Goal:</span> work with the extended nine-locus panel including DQA1, DPA1, DPB1 and
+DRB3/4/5.</p>
+<p><span class="label">Output loci:</span> A, B, C, DRB1, DQA1, DQB1, DRB3/4/5, DPA1, DPB1</p>
+<p><span class="label">Population:</span> CAU</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*02:01+A*24:02^C*03:03+C*07:01^B*15:01+B*18:01^DRB1*04:01+DRB1*11:01^DQA1*03:01+DQA1*05:05^DQB1*03:01+DQB1*03:02^DPA1*01:03+DPA1*01:03^DPB1*02:01+DPB1*04:01</pre>
+<p>
+Note that DRB3/4/5 is supplied as one locus carrying whichever of DRB3, DRB4 or DRB5 is present on each
+chromosome (here a DRB3 and a DRB4). If a chromosome carries none of these genes, that allele is simply
+left out and treated as a null. DPA1 here is homozygous (<code>DPA1*01:03</code> on both chromosomes).
+</p>
+</div>
+
+<h2>Example 4 &mdash; Partial typing (impute the missing loci)</h2>
+<div class="case">
+<p><span class="label">Goal:</span> only HLA-A, HLA-B and HLA-DRB1 were typed, but you want a full
+nine-locus prediction.</p>
+<p><span class="label">Output loci:</span> tick all nine</p>
+<p><span class="label">Population:</span> AFA (or a detailed code such as AAFA)</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*30:01+A*68:02^B*42:01+B*53:01^DRB1*03:02+DRB1*11:01</pre>
+<p>
+You type three loci and request nine. ML-GRIM fills in C, DQA1, DQB1, DRB3/4/5, DPA1 and DPB1 from the
+African American haplotype frequencies. Expect the probability to be distributed over more genotypes than
+in the fully typed cases &mdash; the untyped loci genuinely have several likely values. To sharpen the
+result, type additional informative loci (HLA-C and HLA-DRB1 partners help most).
+</p>
+</div>
+
+<h2>Example 5 &mdash; Mixed resolution and ambiguity</h2>
+<div class="case">
+<p><span class="label">Goal:</span> handle typing exactly as it often arrives from a lab &mdash; some loci at
+high resolution, some at low resolution, some ambiguous.</p>
+<p><span class="label">Output loci:</span> A, B, C, DRB1, DQB1</p>
+<p><span class="label">Population:</span> API (or a detailed code such as JAPI)</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*24:02+A*02:01/A*02:07^C*01:02+C*03:04^B*54:01+B*40:01^DRB1*04:05+DRB1*09:01^DQB1*04:01+DQB1*03:03</pre>
+<p>
+The second HLA-A allele is ambiguous: <code>A*02:01/A*02:07</code> means it is either
+<code>A*02:01</code> or <code>A*02:07</code> (the <code>/</code> operator marks allelic ambiguity).
+GRIMMARD considers both possibilities and uses the population frequencies to weigh them. You can mix in
+lower-resolution forms the same way &mdash; antigen-level codes (e.g. <code>A2</code>), NMDP multiple-allele
+codes (e.g. <code>A*02:AB</code>), or G/P groups (e.g. <code>A*02:01P</code>) &mdash; and py-ard will
+normalize them before imputation.
+</p>
+</div>
+
+<h2>Example 6 &mdash; Comparing several populations at once</h2>
+<div class="case">
+<p><span class="label">Goal:</span> the individual is of uncertain or mixed ancestry, so you want to see how a
+typing is supported under more than one population.</p>
+<p><span class="label">Output loci:</span> A, B, C, DRB1, DQB1</p>
+<p><span class="label">Population:</span> select several, e.g. CAU <em>and</em> HIS <em>and</em> AFA</p>
+<p><span class="label">Typing (GL&#8209;string):</span></p>
+<pre>A*01:01+A*02:01^C*06:02+C*07:01^B*57:01+B*08:01^DRB1*07:01+DRB1*03:01^DQB1*03:03+DQB1*02:01</pre>
+<p>
+With multiple populations selected, the <strong>Haplotype separate</strong> tab reports each haplotype's
+probability under every chosen population, so you can see which population best explains the typing and how
+the ranking shifts between them.
+</p>
+</div>
+
+<h2>Entering these in the per-allele boxes instead</h2>
+<p>
+Every example above can equally be entered in the allele boxes on the Home form rather than as a
+GL&#8209;string. For Example&nbsp;1 you would fill:
+</p>
+<table>
+  <thead><tr><th>Box</th><th>Value</th></tr></thead>
+  <tbody>
+    <tr><td>A1 / A2</td><td><code>A*02:01</code> / <code>A*02:01</code></td></tr>
+    <tr><td>B1 / B2</td><td><code>B*40:01</code> / <code>B*57:01</code></td></tr>
+    <tr><td>DRB1 (row 1) / DRB1 (row 2)</td><td><code>DRB1*04:01</code> / <code>DRB1*07:01</code></td></tr>
+    <tr><td>all other boxes</td><td>leave empty</td></tr>
+  </tbody>
+</table>
+<p>Leaving a box empty means that allele was not typed and will be imputed.</p>
+
+<h2>Notes</h2>
+<ul>
+  <li>The alleles above are illustrative, plausible HLA alleles chosen to demonstrate the format; they are
+      not drawn from any real individual.</li>
+  <li>If an example returns no results for your chosen population, the haplotype simply may not appear in
+      that population's frequency table &mdash; try the matching population or the broad code.</li>
+  <li>For the meaning of every field, operator and population code, see the
+      <a href="/Help">Help</a> page.</li>
+</ul>
 
 </div>
-
 {% endblock %}
-

@@ -1,25 +1,305 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet" href="/static/index.css">
 <style>
-    .main-div {
-        margin: auto;
-        width: 80%;
-    }
+.grimmard-help { line-height: 1.6; color: #1f2733; padding: 0 32px; box-sizing: border-box; }
+.grimmard-help a { color: #66b3ff; font-weight: 600; }
+.grimmard-help a:hover { color: #93caff; }
+.grimmard-help h1 { color: #16314f; border-bottom: 2px solid #2f6db5; padding-bottom: 6px; }
+.grimmard-help h2 { color: #16314f; margin-top: 1.8em; border-bottom: 2px solid #2f6db5; padding-bottom: 4px; }
+.grimmard-help h3 { color: #2f6db5; margin-top: 1.3em; }
+.grimmard-help code, .grimmard-help kbd {
+  font-family: Consolas, "Courier New", monospace;
+  background: transparent; border: none; padding: 0;
+  font-size: 0.92em; color: #16314f; word-break: break-word;
+}
+.grimmard-help td code, .grimmard-help th code,
+.grimmard-help td kbd, .grimmard-help th kbd {
+  background: #f1f5fa; border: 1px solid #d6e0ec; border-radius: 3px; padding: 1px 5px;
+}
+.grimmard-help pre {
+  background: #f1f5fa; border: 1px solid #d6e0ec; border-left: 4px solid #2f6db5;
+  border-radius: 4px; padding: 12px 14px; overflow-x: auto; font-size: 0.92em;
+}
+.grimmard-help table { border-collapse: collapse; width: 100%; margin: 1em 0; font-size: 0.94em; }
+.grimmard-help th, .grimmard-help td { border: 1px solid #d6e0ec; padding: 7px 10px; text-align: left; vertical-align: top; }
+.grimmard-help th { background: #eaf1f9; color: #16314f; }
+.grimmard-help tbody tr { background: #ffffff; }
+.grimmard-help tbody tr:nth-child(even) { background: #eef3f9; }
+.grimmard-help .note {
+  background: #fff8e6; border: 1px solid #f0dca0; border-left: 4px solid #e0b93a;
+  border-radius: 4px; padding: 10px 14px; margin: 1em 0;
+}
+.grimmard-help .tip {
+  background: #ecf7ef; border: 1px solid #b9e0c4; border-left: 4px solid #41a05f;
+  border-radius: 4px; padding: 10px 14px; margin: 1em 0;
+}
+.grimmard-help ul, .grimmard-help ol { padding-left: 1.4em; }
+.grimmard-help li { margin: 0.3em 0; }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="page-top">
-    <h1>Help</h1>
-</div>
-<div class="main-div">
-    The purpose of this website is to provide imputations and probabilities for genotypes (full or partial). <br>
-    The website receives the patient's HLA typing (as a gl string or separate alleles) and the patient's race as input. <br>
-    Using py-ard and grimm, the website return the pateint's possible genotypes (and the probability for each) and the patient's possible haplotypes (and the probability for each according to race). <br>
-    Input
-    
+<div class="grimmard-help">
+
+<h1>Help</h1>
+
+<p>
+GRIMMARD performs HLA <strong>imputation</strong>: given an individual's HLA typing
+(complete or partial, high- or low-resolution) together with the population(s) they belong to,
+it returns the most probable full genotypes, the haplotype pairs that compose them, and the
+individual haplotype probabilities &mdash; each with an associated probability. It combines
+<a href="https://github.com/nmdp-bioinformatics/py-ard">py-ard</a> (which normalizes the many
+ways HLA typing can be written into a single standard form) with the graph-based imputation
+engine <strong>ML-GRIM</strong> (the imputation component of GRIMM-II).
+</p>
+
+<p>
+This page explains every field on the <a href="/Home">Home</a> form,
+how to write the typing input, and how to read the results. New users can jump straight to the
+worked cases on the <a href="/Example">Example</a> page.
+</p>
+
+<h2>1. What you provide</h2>
+<p>The Home form has three parts, filled top to bottom:</p>
+<ol>
+  <li><strong>Output loci</strong> &mdash; which loci you want the imputation to return.</li>
+  <li><strong>Population (race)</strong> &mdash; the population frequencies used to score solutions.</li>
+  <li><strong>Typing</strong> &mdash; the observed HLA alleles, entered as a GL&#8209;string or in the per&#8209;allele boxes.</li>
+</ol>
+<p>Then press <strong>Submit form</strong>.</p>
+
+<h2>2. Output loci</h2>
+<p>
+GRIMMARD supports up to nine loci. Tick the loci you want included in the imputed result:
+</p>
+<table>
+  <thead><tr><th>Group</th><th>Loci</th></tr></thead>
+  <tbody>
+    <tr><td>HLA class&nbsp;I</td><td><code>A</code>, <code>B</code>, <code>C</code></td></tr>
+    <tr><td>HLA class&nbsp;II</td><td><code>DRB1</code>, <code>DQA1</code>, <code>DQB1</code>, <code>DRB3/4/5</code>, <code>DPA1</code>, <code>DPB1</code></td></tr>
+  </tbody>
+</table>
+<ul>
+  <li>You do <strong>not</strong> have to type every locus you select. You may type only a few loci
+      and ask the algorithm to <em>impute</em> (fill in) the rest from population frequencies.</li>
+  <li><code>DRB3/4/5</code> is treated as a single locus. The DRB3, DRB4 and DRB5 genes are present or
+      absent depending on the DRB1 haplotype; their absence is handled as a null allele
+      (see &sect;6).</li>
+  <li>HLA-DQ and HLA-DP are heterodimers, so the alpha-chain loci (<code>DQA1</code>, <code>DPA1</code>)
+      and beta-chain loci (<code>DQB1</code>, <code>DPB1</code>) are reported separately.</li>
+  <li>The frequency tables limit which loci can be returned. If you request a locus that is not
+      covered by the chosen population's frequencies, it cannot be imputed.</li>
+</ul>
+
+<h2>3. Population (race)</h2>
+<p>
+HLA alleles do not occur independently; they travel together on haplotypes whose frequencies differ
+markedly between populations. Imputation therefore needs a population so it can assign probabilities.
+Choosing a population that matches the individual is the single biggest factor in getting accurate,
+well-ranked results.
+</p>
+<p>
+GRIMMARD uses the NMDP / Be&nbsp;The&nbsp;Match operational categories: five <strong>broad</strong>
+populations, each subdividing into more specific <strong>detailed</strong> populations. Use a detailed
+population when you know it; otherwise fall back to the broad one.
+</p>
+
+<table>
+  <thead><tr><th>Broad</th><th>Detailed code</th><th>Description</th></tr></thead>
+  <tbody>
+    <tr><td rowspan="5"><strong>AFA</strong><br>African&nbsp;American</td><td><code>AFA</code></td><td>African American (broad)</td></tr>
+    <tr><td><code>AAFA</code></td><td>African American</td></tr>
+    <tr><td><code>AFB</code></td><td>African</td></tr>
+    <tr><td><code>CARB</code></td><td>Black Caribbean</td></tr>
+    <tr><td><code>SCAMB</code></td><td>Black, South or Central American</td></tr>
+
+    <tr><td rowspan="9"><strong>API</strong><br>Asian or<br>Pacific&nbsp;Islander</td><td><code>API</code></td><td>Asian or Pacific Islander (broad)</td></tr>
+    <tr><td><code>AINDI</code></td><td>South Asian Indian</td></tr>
+    <tr><td><code>FILII</code></td><td>Filipino</td></tr>
+    <tr><td><code>HAWI</code></td><td>Hawaiian or other Pacific Islander</td></tr>
+    <tr><td><code>JAPI</code></td><td>Japanese</td></tr>
+    <tr><td><code>KORI</code></td><td>Korean</td></tr>
+    <tr><td><code>NCHI</code></td><td>Chinese</td></tr>
+    <tr><td><code>SCSEAI</code></td><td>Southeast Asian</td></tr>
+    <tr><td><code>VIET</code></td><td>Vietnamese</td></tr>
+
+    <tr><td rowspan="3"><strong>CAU</strong><br>Caucasian</td><td><code>CAU</code></td><td>Caucasian (broad)</td></tr>
+    <tr><td><code>EURCAU</code></td><td>White European</td></tr>
+    <tr><td><code>MENAFC</code></td><td>Middle Eastern or North Coast of Africa</td></tr>
+
+    <tr><td rowspan="4"><strong>HIS</strong><br>Hispanic</td><td><code>HIS</code></td><td>Hispanic (broad)</td></tr>
+    <tr><td><code>CARHIS</code></td><td>Hispanic Caribbean</td></tr>
+    <tr><td><code>MSWHIS</code></td><td>Mexican or Chicano</td></tr>
+    <tr><td><code>SCAHIS</code></td><td>Hispanic, South or Central American</td></tr>
+
+    <tr><td rowspan="4"><strong>NAM</strong><br>Native&nbsp;American</td><td><code>CARIBI</code></td><td>Caribbean Indian</td></tr>
+    <tr><td><code>AMIND</code></td><td>North American Indian</td></tr>
+    <tr><td><code>AISC</code></td><td>American Indian, South or Central American</td></tr>
+    <tr><td><code>ALANAM</code></td><td>Alaska Native or Aleut</td></tr>
+  </tbody>
+</table>
+
+<div class="tip">
+<strong>Tips on choosing a population</strong>
+<ul>
+  <li>You may select <strong>more than one</strong> population. Each haplotype is then scored under
+      every selected population, which is useful for individuals of mixed or uncertain ancestry and
+      for comparing how a result is supported across groups.</li>
+  <li>If you only know the broad category (e.g. the person is Caucasian but not which subgroup),
+      pick the broad code (<code>CAU</code>).</li>
+  <li>The match likelihood of finding compatible donors varies strongly by population, so the
+      population you choose changes both which genotypes appear and their ranking.</li>
+</ul>
 </div>
 
+<h2>4. Entering the typing</h2>
+<p>You can enter the observed alleles in two equivalent ways.</p>
+
+<h3>4a. GL&#8209;string (recommended)</h3>
+<p>
+A <strong>Genotype List string</strong> (GL&#8209;string) is the standard text format for HLA typing
+(Milius&nbsp;et&nbsp;al., 2013). It is built from allele names and a small set of operators:
+</p>
+<table>
+  <thead><tr><th>Operator</th><th>Meaning</th><th>Example</th></tr></thead>
+  <tbody>
+    <tr><td><code>*</code> and <code>:</code></td><td>Separate the locus, allele family and protein fields of an allele name</td><td><code>A*02:01</code></td></tr>
+    <tr><td><code>+</code></td><td>Joins the <strong>two alleles at one locus</strong> (the two chromosomes)</td><td><code>A*02:01+A*24:02</code></td></tr>
+    <tr><td><code>^</code></td><td>Separates <strong>one locus from the next</strong></td><td><code>A*02:01+A*24:02^B*40:01+B*57:01</code></td></tr>
+    <tr><td><code>/</code></td><td><strong>Allelic ambiguity</strong>: the allele is one of several possibilities</td><td><code>A*02:01/A*02:02</code></td></tr>
+  </tbody>
+</table>
+
+<p>A typical well-formed five-locus GL&#8209;string looks like this:</p>
+<pre>A*02:01+A*24:02^C*03:03+C*07:01^B*40:01+B*57:01^DRB1*04:01+DRB1*07:01^DQB1*03:02+DQB1*03:03</pre>
+
+<p>GRIMMARD also accepts lower-resolution and ambiguous input, including:</p>
+<ul>
+  <li><strong>Multiple Allele Codes (MAC / NMDP codes)</strong>, e.g. <code>A*02:AB</code>, which stand
+      for a defined set of alleles.</li>
+  <li><strong>ARD groups</strong> &mdash; G groups and P groups, e.g. <code>A*02:01:01G</code> or
+      <code>A*02:01P</code>.</li>
+  <li><strong>Serological / antigen-level</strong> typing (e.g. <code>A2</code>, <code>B40</code>).</li>
+  <li><strong>Mixed resolution</strong> in a single string &mdash; some loci high-resolution, others
+      low-resolution or serological.</li>
+</ul>
+<p>
+py-ard normalizes all of these to a common form before imputation, so you can paste typing exactly as it
+arrives from the lab.
+</p>
+
+<h3>4b. Per&#8209;allele boxes</h3>
+<p>
+If you prefer not to write a GL&#8209;string, fill the allele boxes on the Home form. They are laid out two
+rows per locus group, one row per chromosome:
+</p>
+<table>
+  <thead><tr><th>Row</th><th>Boxes</th></tr></thead>
+  <tbody>
+    <tr><td>Class&nbsp;I, chromosome&nbsp;1</td><td><code>A1</code> <code>B1</code> <code>C1</code></td></tr>
+    <tr><td>Class&nbsp;I, chromosome&nbsp;2</td><td><code>A2</code> <code>B2</code> <code>C2</code></td></tr>
+    <tr><td>DR / DQ, chromosome&nbsp;1</td><td><code>DRB1</code> <code>DQB1</code> <code>DRB3</code> <code>DRB4</code> <code>DRB5</code></td></tr>
+    <tr><td>DQ / DRB3-4-5, chromosome&nbsp;2</td><td><code>DRB1</code> <code>DQB1</code> <code>DRB3</code> <code>DRB4</code> <code>DRB5</code></td></tr>
+    <tr><td>DP / DQA1, chromosome&nbsp;1</td><td><code>DPB1</code> <code>DPA1</code> <code>DQA1</code></td></tr>
+    <tr><td>DP / DQA1, chromosome&nbsp;2</td><td><code>DPB1</code> <code>DPA1</code> <code>DQA1</code></td></tr>
+  </tbody>
+</table>
+<p>
+Leave a box <strong>empty</strong> for any allele you have not typed. The two methods are interchangeable; use whichever is more convenient.
+</p>
+
+<h2>5. Partial and ambiguous typing</h2>
+<ul>
+  <li><strong>Untyped loci:</strong> simply omit them from the GL&#8209;string or leave their boxes blank.
+      The imputation will fill them in from population frequencies. As few as one locus can be
+      provided, though more typed loci yield sharper, better-ranked results.</li>
+  <li><strong>Untyped second allele at a locus:</strong> if only one allele at a locus was reported, give the
+      one you have; the engine considers the possible partners.</li>
+  <li><strong>Accuracy depends on which loci you type.</strong> The most polymorphic, most informative loci
+      (typically HLA-A, HLA-B and HLA-DRB1) constrain the rest of the genotype most strongly. Typing
+      informative loci gives much better recovery of the true genotype than typing the same number of
+      weakly informative loci.</li>
+</ul>
+
+<h2>6. Null alleles and DRB3/4/5</h2>
+<ul>
+  <li>The DRB3, DRB4 and DRB5 genes are not present on every haplotype. When a gene is absent, that is
+      handled the same way as a null allele, so blank DRB3/4/5 boxes are expected and correct on many
+      haplotypes.</li>
+  <li>Only one of DRB3, DRB4 or DRB5 occurs on a given chromosome, which is why the three are grouped as a
+      single <code>DRB3/4/5</code> locus.</li>
+</ul>
+
+<h2>7. How the imputation works (in brief)</h2>
+<p>
+ML-GRIM uses a fast two-stage procedure. First a <em>blocking</em> stage runs classical graph-based
+imputation on the (up to three) most informative typed loci, producing every genotype consistent with
+those loci. Each candidate is then checked for consistency with the remaining typed loci and the missing
+loci are filled in from the population haplotype frequencies. This keeps memory and run time low while
+guaranteeing that no consistent genotype is missed. Typical run time is well under one second.
+Probabilities are computed from the population frequencies and normalized so that the genotype
+probabilities for the individual sum to&nbsp;1. By default the most probable solutions are returned
+(the engine considers a large candidate set and reports the top-ranked genotypes).
+</p>
+
+<h2>8. Reading the results</h2>
+<p>After you submit, the results are organized into tabs:</p>
+<table>
+  <thead><tr><th>Tab</th><th>What it shows</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Genotypes</strong></td>
+        <td>Ranked list of complete <em>unphased</em> genotypes consistent with your input, each with its
+            probability and frequency. The probabilities are normalized to sum to&nbsp;1 across the
+            returned genotypes.</td></tr>
+    <tr><td><strong>Haplotype couples</strong></td>
+        <td>The <em>phased</em> haplotype pairs (the two chromosomes) that make up the genotypes, each with
+            its probability. One unphased genotype can arise from several haplotype pairings.</td></tr>
+    <tr><td><strong>Haplotype agents</strong></td>
+        <td>The probability (frequency) of each individual haplotype, reported separately for each
+            population you selected &mdash; useful for seeing how strongly each population supports a
+            given haplotype.</td></tr>
+  </tbody>
+</table>
+<p>
+A higher probability means a solution is more consistent with the typing under the chosen population
+frequencies. If the true genotype is rare or the typing is sparse, probability mass spreads over many
+candidates and the top result may carry only a modest probability &mdash; this is expected and reflects
+genuine ambiguity, not an error.
+</p>
+
+<h2>9. Troubleshooting</h2>
+<table>
+  <thead><tr><th>Symptom</th><th>Likely cause / fix</th></tr></thead>
+  <tbody>
+    <tr><td>No results / empty output</td>
+        <td>The typing may be internally inconsistent, or no haplotype with those alleles exists in the
+            chosen population's frequencies. Re-check the alleles and try the broad population code, or
+            add the population that fits the individual.</td></tr>
+    <tr><td>An allele is rejected</td>
+        <td>Check spelling and format (<code>Locus*field:field</code>, e.g. <code>DRB1*04:01</code>).
+            Very new or non-standard allele names may not be in the reference; try a G/P group or MAC
+            equivalent.</td></tr>
+    <tr><td>A requested locus is missing from the output</td>
+        <td>That locus is not covered by the selected population's frequencies, or it was not ticked under
+            <em>output loci</em>.</td></tr>
+    <tr><td>Top genotype has low probability</td>
+        <td>Normal for sparse or low-resolution typing. Type more (or more informative) loci, or at higher
+            resolution, to concentrate the probability.</td></tr>
+  </tbody>
+</table>
+
+<h2>10. Citation and source code</h2>
+<ul>
+  <li>Imputation engine (ML-GRIM): <a href="https://github.com/nmdp-bioinformatics/py-graph-imputation">github.com/nmdp-bioinformatics/py-graph-imputation</a></li>
+  <li>Typing normalization (py-ard): <a href="https://github.com/nmdp-bioinformatics/py-ard">github.com/nmdp-bioinformatics/py-ard</a></li>
+  <li>GRIMMARD web application: <a href="https://github.com/louzounlab/grimmard">github.com/louzounlab/grimmard</a></li>
+</ul>
+<p>
+If you use GRIMMARD in your work, please cite the GRIMM-II paper (Kirshenboim&nbsp;et&nbsp;al.) describing
+ML-GRIM and ML-GRMA, together with the underlying GRIMM framework (Maiers&nbsp;et&nbsp;al., 2019; Israeli&nbsp;et&nbsp;al.).
+For questions, contact <a href="mailto:louzouy@math.biu.ac.il">louzouy@math.biu.ac.il</a>.
+</p>
+
+</div>
 {% endblock %}
